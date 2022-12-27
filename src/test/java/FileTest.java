@@ -1,8 +1,11 @@
 import com.codeborne.pdftest.PDF;
 import com.codeborne.xlstest.XLS;
 import net.lingala.zip4j.core.ZipFile;
+import org.apache.commons.io.FileUtils;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.junit.jupiter.api.Test;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,7 +50,7 @@ public class FileTest {
             result = new String(stream.readAllBytes(), "UTF-8");
         }
         assertThat(result).contains("проверка файла в архиве");
-
+        FileUtils.deleteDirectory(new File("./src/test/resources/zip/"));
     }
 
     @Test

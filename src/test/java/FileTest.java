@@ -1,15 +1,10 @@
 import com.codeborne.pdftest.PDF;
 import com.codeborne.xlstest.XLS;
-import org.apache.commons.io.IOUtils;
+import net.lingala.zip4j.core.ZipFile;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
+import java.io.FileInputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -38,15 +33,21 @@ public class FileTest {
 
     @Test
     void fileZipTest() throws Exception {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        String entryAsString = null;
-        try (ZipInputStream stream = new ZipInputStream(classLoader.getResourceAsStream("Txt.zip"))) {
-            ZipEntry entry;
-            while ((entry = stream.getNextEntry()) != null) {
-                entryAsString = IOUtils.toString(stream, StandardCharsets.UTF_8);
-            }
+        String source = "./src/test/resources/Zip.zip";
+        String destination = "./src/test/resources/zip/";
+        String password = "zxc";
+
+        ZipFile zipFile = new ZipFile(source);
+        if (zipFile.isEncrypted()) {
+            zipFile.setPassword(password);
         }
-        Assertions.assertTrue(entryAsString.contains("проверка файла в архиве"));
+        zipFile.extractAll(destination);
+        String result;
+        try (FileInputStream stream = new FileInputStream("./src/test/resources/zip/TXT.txt")) {
+            result = new String(stream.readAllBytes(), "UTF-8");
+        }
+        assertThat(result).contains("проверка файла в архиве");
+
     }
 
     @Test
@@ -58,4 +59,6 @@ public class FileTest {
         }
         assertThat(text).contains("Тест2");
     }
+
+
 }
